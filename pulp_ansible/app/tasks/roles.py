@@ -76,7 +76,7 @@ class RoleFirstStage(Stage):
         with ProgressReport(message="Parsing Role Metadata", code="parsing.metadata") as pb:
             async for metadata in self._fetch_roles():
                 for version in metadata["summary_fields"]["versions"]:
-                    if metadata["github_server"] and not metadata["github_server"] == "github.com":
+                    if metadata["github_server"]:
                         url = "https://%s:%s@%s/api/v3/repos/%s/%s/tarball/%s" % (
                             os.environ['GH_USERNAME'],
                             os.environ['GH_TOKEN'],
