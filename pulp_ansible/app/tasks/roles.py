@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import math
+import os
 
 from asyncio import FIRST_COMPLETED
 from gettext import gettext as _
@@ -18,10 +19,6 @@ from pulp_ansible.app.tasks.utils import get_api_version, get_page_url, parse_me
 
 
 log = logging.getLogger(__name__)
-
-
-# The Github URL template to fetch a .tar.gz file from
-GITHUB_URL = "https://github.com/%s/%s/archive/%s.tar.gz"
 
 
 def synchronize(remote_pk, repository_pk, mirror=False):
@@ -79,11 +76,21 @@ class RoleFirstStage(Stage):
         with ProgressReport(message="Parsing Role Metadata", code="parsing.metadata") as pb:
             async for metadata in self._fetch_roles():
                 for version in metadata["summary_fields"]["versions"]:
-                    url = GITHUB_URL % (
-                        metadata["github_user"],
-                        metadata["github_repo"],
-                        version["name"],
-                    )
+                    if metadata["github_server"] and not metadata["github_server"] == "github.com":
+                        url = "https://%s:%s@%s/api/v3/repos/%s/%s/tarball/%s" % (
+                            os.environ['GH_USERNAME'],
+                            os.environ['GH_TOKEN'],
+                            metadata["github_server"],
+                            metadata["github_user"],
+                            metadata["github_repo"],
+                            version["name"],
+                        )
+                    else:
+                        url = "https://github.com/%s/%s/archive/%s.tar.gz" % (
+                            metadata["github_user"],
+                            metadata["github_repo"],
+                            version["name"],
+                        )
                     role = Role(
                         version=version["name"],
                         name=metadata["name"],
@@ -114,6 +121,7 @@ class RoleFirstStage(Stage):
                     "summary_fields": result["summary_fields"],  # needed for versions
                     "github_user": result["github_user"],
                     "github_repo": result["github_repo"],
+                    "github_server": result["github_server"],
                 }
                 yield role
 
