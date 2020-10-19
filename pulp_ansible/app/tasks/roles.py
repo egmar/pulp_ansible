@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 
 # The Github URL template to fetch a .tar.gz file from
-GITHUB_URL = "https://%s:%s@%s/api/v3/repos/%s/%s/tarball/%s.tar.gz"
+GITHUB_URL = "https://%s:%s@%s/api/v3/repos/%s/%s/tarball/%s"
 
 
 def synchronize(remote_pk, repository_pk, mirror=False):
