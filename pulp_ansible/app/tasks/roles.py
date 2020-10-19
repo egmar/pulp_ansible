@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import math
+import os
 
 from asyncio import FIRST_COMPLETED
 from gettext import gettext as _
@@ -21,7 +22,7 @@ log = logging.getLogger(__name__)
 
 
 # The Github URL template to fetch a .tar.gz file from
-GITHUB_URL = "https://github.com/%s/%s/archive/%s.tar.gz"
+GITHUB_URL = "https://%s:%s@%s/api/v3/repos/%s/%s/tarball/%s.tar.gz"
 
 
 def synchronize(remote_pk, repository_pk, mirror=False):
@@ -80,6 +81,9 @@ class RoleFirstStage(Stage):
             async for metadata in self._fetch_roles():
                 for version in metadata["summary_fields"]["versions"]:
                     url = GITHUB_URL % (
+                        os.environ["GH_USERNAME"],
+                        os.environ["GH_TOKEN"],
+                        "github.ibm.com",
                         metadata["github_user"],
                         metadata["github_repo"],
                         version["name"],
