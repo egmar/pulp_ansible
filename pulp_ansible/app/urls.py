@@ -15,7 +15,7 @@ from pulp_ansible.app.galaxy.v3 import views as views_v3
 from pulp_ansible.app.viewsets import CollectionUploadViewSet
 
 
-GALAXY_API_ROOT = getattr(settings, "GALAXY_API_PATH_PREFIX", "pulp_ansible/galaxy/<path:path>/api/")
+GALAXY_API_ROOT = getattr(settings, "GALAXY_API_PATH_PREFIX"[1:], "pulp_ansible/galaxy/<path:path>/api/")
 
 
 v1_urls = [
